@@ -9,3 +9,15 @@ services:
     init: true
     ports:
       - 8000:8000
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
+networks:
+  default:
+    name: ainergy-net
