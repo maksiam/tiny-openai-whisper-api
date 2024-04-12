@@ -5,6 +5,7 @@ import os
 import shutil
 from functools import lru_cache
 from pathlib import Path
+import torch
 from typing import Any, List, Union, Optional
 
 from datetime import timedelta
@@ -62,7 +63,7 @@ def transcribe(audio_path: str, whisper_model: str, **whisper_args):
 
 WHISPER_DEFAULT_SETTINGS = {
 #    "whisper_model": "base",
-    "whisper_model": "large-v2",
+    "whisper_model": "large-v3",
     "temperature": 0.0,
     "temperature_increment_on_fallback": 0.2,
     "no_speech_threshold": 0.6,
@@ -127,7 +128,7 @@ async def transcriptions(model: str = Form(...),
     if response_format in ['srt']:
         ret = ""
         for seg in transcript['segments']:
-            
+
             td_s = timedelta(milliseconds=seg["start"]*1000)
             td_e = timedelta(milliseconds=seg["end"]*1000)
 
@@ -157,5 +158,4 @@ async def transcriptions(model: str = Form(...),
             transcript['language'] = 'japanese'
         return transcript
 
-    return {'text': transcript['text']}
-
+    return {'text': transcript['text'], "gpu_max": torch.cuda.max_memory_allocated(device="cuda")}
